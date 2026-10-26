@@ -1,6 +1,6 @@
 def moving_average(values, window):
     """Average of each run of `window` consecutive values."""
-    return [sum(values[i:i + window]) / window for i in range(len(values) - window)]
+    return [sum(values[i:i + window]) / window for i in range(len(values) - window + 1)]
 
 
 def percentile(values, p):
