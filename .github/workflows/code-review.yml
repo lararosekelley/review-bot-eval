@@ -1,17 +1,11 @@
-# Minimal install: copy to .github/workflows/code-review.yml and set the secret.
 name: "Code Review Bot"
 
 on:
   pull_request:
     types: [opened, ready_for_review]
-  pull_request_review_comment:
-    types: [created]
   issue_comment:
     types: [created]
 
-# A called workflow can never hold more permission than its caller, and many
-# repos default GITHUB_TOKEN to read-only - so these have to be declared here or
-# the bot cannot post comments.
 permissions:
   contents: read
   pull-requests: write
@@ -19,12 +13,19 @@ permissions:
   id-token: write
   actions: read
 
-concurrency:
-  group: code-review-${{ github.event.pull_request.number || github.event.issue.number }}-${{ github.event_name }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
 jobs:
   review:
-    uses: lararosekelley/review-bot/.github/workflows/review.yml@v1.3.0
-    secrets:
-      anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+    if: >-
+      (github.event_name == 'pull_request' && github.event.pull_request.author_association == 'OWNER') ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request &&
+        contains(github.event.comment.body, '@bot review') && github.event.comment.author_association == 'OWNER')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          ref: refs/pull/${{ github.event.pull_request.number || github.event.issue.number }}/head
+      - uses: lararosekelley/review-bot@feat/sandbox-smoke
+        with:
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
