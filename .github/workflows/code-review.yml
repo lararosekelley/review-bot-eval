@@ -1,0 +1,22 @@
+name: "Code Review Bot"
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+  pull_request_review_comment:
+    types: [created]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+  actions: read
+
+jobs:
+  review:
+    uses: lararosekelley/review-bot/.github/workflows/review.yml@cd8c053c29e021c8e10f65c23b707a9f59cc94da
+    secrets:
+      anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
