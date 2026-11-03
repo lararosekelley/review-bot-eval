@@ -3,6 +3,8 @@ name: "Code Review Bot"
 on:
   pull_request:
     types: [opened, ready_for_review]
+  pull_request_review_comment:
+    types: [created]
   issue_comment:
     types: [created]
 
@@ -15,17 +17,6 @@ permissions:
 
 jobs:
   review:
-    if: >-
-      (github.event_name == 'pull_request' && github.event.pull_request.author_association == 'OWNER') ||
-      (github.event_name == 'issue_comment' && github.event.issue.pull_request &&
-        contains(github.event.comment.body, '@bot review') && github.event.comment.author_association == 'OWNER')
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-          ref: refs/pull/${{ github.event.pull_request.number || github.event.issue.number }}/head
-      - uses: lararosekelley/review-bot@feat/sandbox-smoke
-        with:
-          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+    uses: lararosekelley/review-bot/.github/workflows/review.yml@cd8c053c29e021c8e10f65c23b707a9f59cc94da
+    secrets:
+      anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
