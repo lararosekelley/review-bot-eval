@@ -17,6 +17,6 @@ permissions:
 
 jobs:
   review:
-    uses: lararosekelley/review-bot/.github/workflows/review.yml@git-stk-eval
+    uses: lararosekelley/review-bot/.github/workflows/review.yml@451bc98146a1ab84dd42b5452a83a64cd0d4cf15
     secrets:
       anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
